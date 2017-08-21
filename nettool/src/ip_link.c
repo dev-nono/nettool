@@ -57,20 +57,23 @@ int ip_link(int argc, char *argv[])
       {
          vRetcode = ip_link_UP(argv[2], 1);
       }
-      if( strcmp(ARG_LINK_DOWN, argv[1]) == 0 )
+      else if( strcmp(ARG_LINK_DOWN, argv[1]) == 0 )
       {
          vRetcode = ip_link_UP(argv[2], 0);
 
       }
-      if( strcmp(ARG_LINK_INFO, argv[1]) == 0 )
+      else if( strcmp(ARG_LINK_INFO, argv[1]) == 0 )
       {
          vRetcode = ip_link_Info(argv[2]);
+      }
+      else
+      {
+         PrintUsage(argc,argv);
       }
    }
    else
    {
       PrintUsage(argc,argv);
-
    }
 
    return vRetcode;

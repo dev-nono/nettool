@@ -16,8 +16,7 @@
 #include "libnettool.h"
 #include "util.h"
 
-int         g_ip_link_Init = 0;
-pthread_t   g_ip_link_thread;
+pthread_t   g_ThreadID;
 
 #define IPLINK_MAX_ARRAY 1024
 
@@ -30,6 +29,20 @@ struct s_ip_link_notify
 
 struct s_ip_link_notify g_arrayNotification[IPLINK_MAX_ARRAY];
 
+
+//****************************************
+//* singleton int module
+//****************************************
+int         g_ModuleInit = 0;
+static void setModuleInit()
+{
+   g_ModuleInit = 1;
+}
+static int getModuleInit()
+{
+   return g_ModuleInit;
+}
+
 //*************************************************************
 //*
 //*************************************************************
@@ -40,6 +53,32 @@ static int ip_link_add_notification(   const char*                a_DeviceName,
    int vRetcode = 0;
 
    return vRetcode;
+
+}
+static void * thread_start(void *arg)
+{
+
+   while(1)
+   {
+      usleeep(1e6 / 1000); // 1ms
+   }
+}
+
+//*************************************************************
+//*
+//*************************************************************
+static int CreateThread()
+{
+   int               vRetcode    = 0;
+   pthread_attr_t    *pAttr      = 0;
+   void              *pArg       = 0;
+
+   //*************************************************************
+   //*
+   //*************************************************************
+
+   vRetcode =  pthread_create(&g_ThreadID, pAttr,thread_start, pArg);
+
 
 }
 //*************************************************************
@@ -63,21 +102,21 @@ int nettool_link_notify(   const char*                a_DeviceName,
    //**************************************************
    // create thread
    //**************************************************
-   if( (vRetcode == 0 )  && ( g_ip_link_Init == 0 ) )
+   if( (vRetcode == 0 )  && ( getModuleInit() == 0 ) )
    {
+      vRetcode  = CreateThread();
       //vSocket = util_OpenSocket( );
 
 
-      g_ip_link_Init = 1;
+      setModuleInit();
    }
 
    //**************************************************
    // add notification
    //**************************************************
-   if( (vRetcode == 0 )  && ( g_ip_link_Init != 0 ) )
+   if( (vRetcode == 0 )  && ( getModuleInit() != 0 ) )
    {
       vRetcode = ip_link_add_notification(a_DeviceName,a_pfunction,a_FlagToCheck);
-
    }
 
    return vRetcode;
