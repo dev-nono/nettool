@@ -117,6 +117,7 @@ int nettool_link_notify(   const char*                a_DeviceName,
    {
       vRetcode  = CreateThread();
       //vSocket = util_OpenSocket( );
+      //
 
 
       setModuleInit();
