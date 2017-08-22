@@ -26,8 +26,9 @@ struct s_ip_link_notify
       nettool_link_notify_func_t pfunction;
       int                        FlagToCheck;
 };
+typedef struct s_ip_link_notify  s_ip_link_notify_t;
 
-struct s_ip_link_notify g_arrayNotification[IPLINK_MAX_ARRAY];
+s_ip_link_notify_t g_arrayNotification[IPLINK_MAX_ARRAY];
 
 
 //****************************************
@@ -47,10 +48,14 @@ static int getModuleInit()
 //*
 //*************************************************************
 static int ip_link_add_notification(   const char*                a_DeviceName,
-                           nettool_link_notify_func_t a_pfunction,
-                           int                        a_FlagToCheck)
+                                       nettool_link_notify_func_t a_pfunction,
+                                       int                        a_FlagToCheck)
 {
    int vRetcode = 0;
+
+   s_ip_link_notify_t *pStructNotify = (s_ip_link_notify_t *)calloc(1,sizeof(s_ip_link_notify_t));
+
+
 
    return vRetcode;
 
@@ -60,8 +65,10 @@ static void * thread_start(void *arg)
 
    while(1)
    {
-      usleeep(1e6 / 1000); // 1ms
+      usleep(1e6 / 1000); // 1ms
    }
+
+   return 0;
 }
 
 //*************************************************************
@@ -79,6 +86,7 @@ static int CreateThread()
 
    vRetcode =  pthread_create(&g_ThreadID, pAttr,thread_start, pArg);
 
+   return vRetcode;
 
 }
 //*************************************************************
