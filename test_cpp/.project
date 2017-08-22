@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>test_cpp</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.cdt.managedbuilder.core.genmakebuilder</name>
+			<triggers>clean,full,incremental,</triggers>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>org.eclipse.cdt.managedbuilder.core.ScannerConfigBuilder</name>
+			<triggers>full,incremental,</triggers>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.eclipse.cdt.core.cnature</nature>
+		<nature>org.eclipse.cdt.core.ccnature</nature>
+		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
+		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
+	</natures>
+	<linkedResources>
+		<link>
+			<name>src/UTIL_Timespec.cpp</name>
+			<type>1</type>
+			<location>/home/hico/CR5-Debian/branches/jira_06/dev/LdT/util/UTIL_Timespec.cpp</location>
+		</link>
+		<link>
+			<name>src/UTIL_Timespec.h</name>
+			<type>1</type>
+			<location>/home/hico/CR5-Debian/branches/jira_06/dev/LdT/util/UTIL_Timespec.h</location>
+		</link>
+	</linkedResources>
+</projectDescription>

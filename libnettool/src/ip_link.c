@@ -55,7 +55,10 @@ static int ip_link_add_notification(   const char*                a_DeviceName,
 
    s_ip_link_notify_t *pStructNotify = (s_ip_link_notify_t *)calloc(1,sizeof(s_ip_link_notify_t));
 
+   if(pStructNotify)
+{
 
+}
 
    return vRetcode;
 
