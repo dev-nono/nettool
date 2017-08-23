@@ -46,7 +46,8 @@ using namespace std;
 #define TEST_MODF                19
 #define TEST_LONG_DOUBLE         20
 #define TEST_UTIL_TIMESPEC       21
-#define TEST_GPIO_SELECT       		22
+#define TEST_GPIO_SELECT         22
+#define TEST_QUEUE               23
 
 
 int Test_WaitFifo()
@@ -91,7 +92,7 @@ int Test_gettimeofday()
 
 void PrintUsage()
 {
-   printf( "\n%d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n \n",
+   printf( "\n%d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n \n",
            TEST_READ_FILE ,                  "CheckReadFile(argc, argv);",
            TEST_PIPE ,                       "CheckPipe",
            TEST_GET_TIME_OF_DAY,             "Test_gettimeofday",
@@ -113,7 +114,9 @@ void PrintUsage()
            TEST_MODF,                        "TEST_MODF",
            TEST_LONG_DOUBLE,                 "TEST_LONG_DOUBLE",
            TEST_UTIL_TIMESPEC,               "TEST_UTIL_TIMESPEC",
-		   TEST_GPIO_SELECT,				"TEST_GPIO_SELECT"
+           TEST_GPIO_SELECT,				      "TEST_GPIO_SELECT",
+           TEST_QUEUE,                       "TEST_QUEUE"
+
    );
 
 
@@ -238,6 +241,11 @@ int main(int argc, char **argv)
           {
         	  Test_Gpio_Select();
         	  break;
+          }
+          case TEST_QUEUE:
+          {
+             main_queue( argc, argv);
+             break;
           }
     default:
             PrintUsage();
