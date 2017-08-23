@@ -104,7 +104,21 @@ int  list_remove(sTAILQ_List_t* a_pList , sTAILQ_ListItem_t *a_pItem)
 
    return pRetvalue;
 }
+int list_concat(sTAILQ_List_t* a_pList_1, sTAILQ_List_t* a_pList_2)
+{
+   int vRetvalue = 0;
 
+   return vRetvalue;
+
+}
+int list_next(sTAILQ_ListItem_t* a_pItem)
+{
+
+}
+int list_insert_after()
+{
+
+}
 //****************************************************
 //*
 //****************************************************
