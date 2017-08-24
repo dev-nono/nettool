@@ -11,16 +11,16 @@
 #include <sys/queue.h>
 #include <stddef.h>
 
+//******************************************************************
 struct sListqContainer
 {
       TAILQ_HEAD(sListq, sListqContainerItem) m_Listq;
 
       int m_count;
 };
-typedef struct sListq sListq_t;
-
 typedef struct sListqContainer sListqContainer_t;
 
+//******************************************************************
 struct sListqContainerItem
 {
       TAILQ_ENTRY( sListqContainerItem) m_Entries;
