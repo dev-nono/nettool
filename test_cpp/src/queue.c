@@ -7,10 +7,13 @@
 
 
 
-#include <sys/queue.h>
+#include <listq.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+
+#include "listq.h"
 
 struct sItemData
 {
@@ -21,116 +24,18 @@ struct sItemData
 typedef struct sItemData ItemData_t;
 
 
-TAILQ_HEAD(sTAILQ_List, sTAILQ_ListItem) ;
-
-
-//struct sTAILQ_List
-//{
-//      struct sTAILQ_ListItem *tqh_first;
-//      struct sTAILQ_ListItem * *tqh_last;
-//
-//};
-typedef struct sTAILQ_List sTAILQ_List_t;
-
-struct sTAILQ_ListItem
-{
-      TAILQ_ENTRY( sTAILQ_ListItem) m_Entries;
-
-      void* p_Data;
-};
-typedef struct sTAILQ_ListItem sTAILQ_ListItem_t;
-
-
-//****************************************************
-//*
-//****************************************************
-int  list_init(sTAILQ_List_t* a_pList)
-{
-   int vRetcode = 0;
-
-
-   if( a_pList )
-   {
-      TAILQ_INIT(a_pList);// Initialisation de liste
-   }
-   else
-   {
-      vRetcode  = -1;
-   }
-
-   return vRetcode;
-}
-//****************************************************
-//*
-//****************************************************
-sTAILQ_ListItem_t* list_add_tail(sTAILQ_List_t* a_pList , void* a_pData)
-{
-   sTAILQ_ListItem_t * pRetvalue = 0;
-
-
-   if( (a_pList == 0 ) || (a_pData == 0 ) )
-   {
-      pRetvalue = 0;
-   }
-   else
-   {
-      pRetvalue = (sTAILQ_ListItem_t * ) calloc(1,sizeof(sTAILQ_ListItem_t));
-      pRetvalue->p_Data = a_pData;
-
-      TAILQ_INSERT_TAIL(a_pList, pRetvalue, m_Entries);
-   }
-
-   return pRetvalue;
-
-}
-//****************************************************
-//*
-//****************************************************
-int  list_remove(sTAILQ_List_t* a_pList , sTAILQ_ListItem_t *a_pItem)
-{
-   int pRetvalue = 0;
-
-
-   if( (a_pList == 0 ) || (a_pItem == 0 ) )
-   {
-      pRetvalue = -1;
-   }
-   else
-   {
-      TAILQ_REMOVE(a_pList, a_pList->tqh_first, m_Entries);
-      free(a_pItem);
-      a_pItem = 0;
-   }
-
-   return pRetvalue;
-}
-int list_concat(sTAILQ_List_t* a_pList_1, sTAILQ_List_t* a_pList_2)
-{
-   int vRetvalue = 0;
-
-   return vRetvalue;
-
-}
-int list_next(sTAILQ_ListItem_t* a_pItem)
-{
-
-}
-int list_insert_after()
-{
-
-}
 //****************************************************
 //*
 //****************************************************
 int main_queue(int argc, char **argv)
 {
 
-   sTAILQ_List_t     vList;
-   sTAILQ_ListItem_t *pItemList = 0;
-   sTAILQ_ListItem_t *pItemList1 = 0;
-   sTAILQ_ListItem_t *pItemList2 = 0;
+   listq_t       pList        = 0;
+   listq_item_t  pItemList    = 0;
+   listq_item_t  pItemList1   = 0;
+   listq_item_t  pItemList2   = 0;
 
-   list_init(&vList);
+   pList = listq_create();
 
    ItemData_t  vItemData1;
    ItemData_t  vItemData2;
@@ -143,48 +48,91 @@ int main_queue(int argc, char **argv)
    strcpy(vItemData1.m_DeviceName,"eth0");
    strcpy(vItemData2.m_DeviceName,"eth1");
 
-   pItemList1 = list_add_tail(&vList,&vItemData1);
-   pItemList2 = list_add_tail(&vList,&vItemData2);
+   pItemList1 = listq_add_tail(pList,&vItemData1);
+   pItemList2 = listq_add_tail(pList,&vItemData2);
 
-   TAILQ_FOREACH(pItemList, &vList, m_Entries)
+
+   for(  pItemList = listq_head(pList);
+         pItemList ;
+         pItemList = listq_next(pItemList)
+   )
    {
-      pItemData = (ItemData_t*)pItemList->p_Data;
+      pItemData = listq_getData(pItemList);
 
-      printf("m_DeviceName = %s \n",pItemData->m_DeviceName);
+      if( pItemData )
+      {
+         printf("m_DeviceName_1 = %s \n" , pItemData->m_DeviceName);
+      }
    }
-   printf("***********************\n");
+   listq_removeItem(pList,pItemList2);
 
-   list_remove(&vList,pItemList1);
-
-   TAILQ_FOREACH(pItemList, &vList, m_Entries)
+   for(  pItemList = listq_head(pList);
+         pItemList ;
+         pItemList = listq_next(pItemList)
+   )
    {
-      pItemData = (ItemData_t*)pItemList->p_Data;
+      pItemData = listq_getData(pItemList);
 
-      printf("m_DeviceName = %s \n",pItemData->m_DeviceName);
-   }
-
-   printf("***********************\n");
-
-   list_remove(&vList,pItemList2);
-
-   TAILQ_FOREACH(pItemList, &vList, m_Entries)
-   {
-      pItemData = (ItemData_t*)pItemList->p_Data;
-
-      printf("m_DeviceName = %s \n",pItemData->m_DeviceName);
-   }
-
-   printf("***********************\n");
-
-
-   TAILQ_FOREACH(pItemList, &vList, m_Entries)
-   {
-      pItemData = (ItemData_t*)pItemList->p_Data;
-
-      printf("m_DeviceName = %s \n",pItemData->m_DeviceName);
+      if( pItemData )
+      {
+         printf("m_DeviceName_2 = %s \n" , pItemData->m_DeviceName);
+      }
    }
 
-return 0;
+   listq_removeItem(pList,pItemList1);
+
+   for(  pItemList = listq_head(pList);
+         pItemList ;
+         pItemList = listq_next(pItemList)
+   )
+   {
+      pItemData = listq_getData(pItemList);
+
+      if( pItemData )
+      {
+         printf("m_DeviceName_3 = %s \n" , pItemData->m_DeviceName);
+      }
+   }
+
+//   TAILQ_FOREACH(pItemList, pList, m_Entries)
+//   {
+//      pItemData = (ItemData_t*)pItemList->p_Data;
+//
+//      printf("m_DeviceName = %s \n",pItemData->m_DeviceName);
+//   }
+//   printf("***********************\n");
+//
+//   list_remove(&pList,pItemList1);
+//
+//   TAILQ_FOREACH(pItemList, &pList, m_Entries)
+//   {
+//      pItemData = (ItemData_t*)pItemList->p_Data;
+//
+//      printf("m_DeviceName = %s \n",pItemData->m_DeviceName);
+//   }
+//
+//   printf("***********************\n");
+//
+//   list_remove(&pList,pItemList2);
+//
+//   TAILQ_FOREACH(pItemList, &pList, m_Entries)
+//   {
+//      pItemData = (ItemData_t*)pItemList->p_Data;
+//
+//      printf("m_DeviceName = %s \n",pItemData->m_DeviceName);
+//   }
+//
+//   printf("***********************\n");
+//
+//
+//   TAILQ_FOREACH(pItemList, &pList, m_Entries)
+//   {
+//      pItemData = (ItemData_t*)pItemList->p_Data;
+//
+//      printf("m_DeviceName = %s \n",pItemData->m_DeviceName);
+//   }
+
+#if 0
    //***********************************
    TAILQ_HEAD(sNameMyList, sItemNotification) vListNotification;
 
@@ -226,6 +174,7 @@ return 0;
    }
 
 
+#endif
 
    return 0;
 }
