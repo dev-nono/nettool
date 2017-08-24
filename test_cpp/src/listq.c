@@ -29,7 +29,7 @@ int listq_destroy(listq_t a_pList )
 {
    int                        vRetcode    = 0;
    sListqContainer_t*         pList       = a_pList;
-   slistqContainerIitem_t*    pItem       = 0;
+   slistqContainerItem_t*    pItem       = 0;
 
    if( pList )
    {
@@ -65,7 +65,7 @@ listq_item_t listq_add_tail( listq_t   a_pList ,
                              void*     a_pData)
 {
    listq_item_t               pRetvalue   = 0;
-   slistqContainerIitem_t*    pItem       = 0;
+   slistqContainerItem_t*    pItem       = 0;
 
    sListqContainer_t*   plist = (sListqContainer_t*) a_pList;
 
@@ -75,7 +75,7 @@ listq_item_t listq_add_tail( listq_t   a_pList ,
    }
    else
    {
-      pItem                = (slistqContainerIitem_t*)calloc(1,sizeof(slistqContainerIitem_t));
+      pItem                = (slistqContainerItem_t*)calloc(1,sizeof(slistqContainerItem_t));
       pItem->p_Data        = a_pData;
       pItem->p_Container   = (sListqContainer_t*)a_pList;
 
@@ -92,11 +92,11 @@ listq_item_t listq_add_tail( listq_t   a_pList ,
 void* listq_getData(    listq_item_t   a_pItem)
 {
    void*          pData = 0;
-   slistqContainerIitem_t*  pItem = 0;
+   slistqContainerItem_t*  pItem = 0;
 
    if( a_pItem )
    {
-      pItem = (slistqContainerIitem_t*)a_pItem;
+      pItem = (slistqContainerItem_t*)a_pItem;
 
       pData = pItem->p_Data;
    }
@@ -111,7 +111,7 @@ int  listq_removeItem(    listq_t       a_pList ,
 {
    int                        vRetvalue         = 0;
    sListqContainer_t*         pContainer        = a_pList;
-   slistqContainerIitem_t*    pContainerItem    = a_pItem;
+   slistqContainerItem_t*    pContainerItem    = a_pItem;
 
 
 
@@ -151,7 +151,7 @@ listq_item_t listq_next( listq_item_t  a_pItem)
    if( a_pItem )
    {
 
-      slistqContainerIitem_t* pItem = (slistqContainerIitem_t*)a_pItem;
+      slistqContainerItem_t* pItem = (slistqContainerItem_t*)a_pItem;
 
       pNext = (listq_item_t)TAILQ_NEXT(pItem,m_Entries);
    }

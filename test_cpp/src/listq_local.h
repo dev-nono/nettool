@@ -29,7 +29,7 @@ struct sListqContainerItem
       sListqContainer_t*      p_Container;
 };
 
-typedef struct sListqContainerItem slistqContainerIitem_t;
+typedef struct sListqContainerItem slistqContainerItem_t;
 
 
 #endif /* LISTQ_LOCAL_H_ */
