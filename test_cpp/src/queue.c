@@ -12,6 +12,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <glib.h>
+
 
 #include "listq.h"
 
@@ -27,7 +29,7 @@ typedef struct sItemData ItemData_t;
 //****************************************************
 //*
 //****************************************************
-int main_queue(int argc, char **argv)
+int main_queue_1(int argc, char **argv)
 {
    int vRetcode = 0;
 
@@ -196,3 +198,50 @@ int main_queue(int argc, char **argv)
 
    return 0;
 }
+
+int main_queue_2(int argc, char **argv)
+{
+   struct sMyData
+   {
+         char  m_Name[128];
+         int   m_Value;
+   }vMyData[2] =
+      {
+         {"item_1",1},
+         {"item_2",2}
+      };
+
+   GSequence *          pList    =    g_sequence_new (NULL);
+
+   GSequenceIter *      pItItem  = 0;
+   GSequenceIter *      pItItem1  = 0;
+   GSequenceIter *      pItItem2  = 0;
+
+   struct sMyData*       pMyData = 0;
+   gpointer             pData  = 0;
+   gpointer             pData1 = &vMyData[0];
+   gpointer             pData2 = &vMyData[1];
+
+   pItItem1 = g_sequence_append (pList,pData1);
+   pItItem2 = g_sequence_append (pList,pData2);
+
+
+
+   for(  pItItem = g_sequence_get_begin_iter(pList);
+         g_sequence_iter_is_end (pItItem) == 0 ;
+         pItItem = g_sequence_iter_next(pItItem)
+   )
+   {
+      pMyData = (struct sMyData*)g_sequence_get(pItItem);
+      printf("data = %s,%d \n",pMyData->m_Name,pMyData->m_Value );
+   }
+
+}
+int main_queue(int argc, char **argv)
+{
+   //main_queue_1(argc, argv);
+
+   main_queue_2(argc, argv);
+
+}
+
