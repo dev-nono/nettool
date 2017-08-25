@@ -29,6 +29,7 @@ typedef struct sItemData ItemData_t;
 //****************************************************
 int main_queue(int argc, char **argv)
 {
+   int vRetcode = 0;
 
    listq_t       pList        = 0;
    listq_item_t  pItemList    = 0;
@@ -49,7 +50,10 @@ int main_queue(int argc, char **argv)
    strcpy(vItemData2.m_DeviceName,"eth1");
 
    pItemList1 = listq_add_tail(pList,&vItemData1);
+   printf("size_1 = %d \n",listq_size(pList));
+
    pItemList2 = listq_add_tail(pList,&vItemData2);
+   printf("size_1 = %d \n",listq_size(pList));
 
 
    for(  pItemList = listq_head(pList);
@@ -64,7 +68,11 @@ int main_queue(int argc, char **argv)
          printf("m_DeviceName_1 = %s \n" , pItemData->m_DeviceName);
       }
    }
-   listq_removeItem(pList,pItemList2);
+   vRetcode = listq_removeItem(pList,pItemList2);
+   printf("size_3 = %d vRetcode=%d\n",listq_size(pList), vRetcode);
+
+   vRetcode = listq_removeItem(pList,pItemList2);
+   printf("size_3_1 = %d vRetcode=%d\n",listq_size(pList), vRetcode);
 
    for(  pItemList = listq_head(pList);
          pItemList ;
@@ -79,7 +87,11 @@ int main_queue(int argc, char **argv)
       }
    }
 
-   listq_removeItem(pList,pItemList1);
+   vRetcode = listq_removeItem(pList,pItemList1);
+   printf("size_4 = %d vRetcode= %d \n",listq_size(pList),vRetcode);
+
+   vRetcode = listq_removeItem(pList,pItemList1);
+   printf("size_4_1 = %d vRetcode= %d \n",listq_size(pList),vRetcode);
 
    for(  pItemList = listq_head(pList);
          pItemList ;
@@ -93,6 +105,12 @@ int main_queue(int argc, char **argv)
          printf("m_DeviceName_3 = %s \n" , pItemData->m_DeviceName);
       }
    }
+
+   vRetcode = listq_removeItem(pList,pItemList1);
+   printf("size_5 = %d vRetcode = %d \n",listq_size(pList),vRetcode);
+
+   vRetcode = listq_removeItem(pList,pItemList1);
+   printf("size_5_1 = %d vRetcode = %d \n",listq_size(pList),vRetcode);
 
 //   TAILQ_FOREACH(pItemList, pList, m_Entries)
 //   {

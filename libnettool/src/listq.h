@@ -14,14 +14,17 @@ typedef void*     listq_item_t;
 
 
 listq_t              listq_create();
+int                  listq_clean(      listq_t        a_pList);
+int                  listq_destroy(    listq_t        a_pList);
 
+int                  listq_size(    listq_t        a_pList);
 
 listq_item_t         listq_add_tail(   listq_t        a_pList ,
                                        void*          a_pData);
 
 void*                listq_getData(    listq_item_t   a_pItem);
 
-int                  listq_removeItem(        listq_t       a_pList ,
+int                  listq_removeItem(    listq_t       a_pList ,
                                           listq_item_t  a_pItem);
 
 int                  listq_concat(     listq_t        a_pList ,

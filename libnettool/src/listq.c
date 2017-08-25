@@ -6,10 +6,11 @@
  */
 
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 #include "listq_local.h"   // type & services NOT exported
 #include "listq.h"         // type & services exported
-
 
 //****************************************************
 //*
@@ -28,8 +29,33 @@ listq_t  listq_create()
 int listq_destroy(listq_t a_pList )
 {
    int                        vRetcode    = 0;
+   //sListqContainer_t*         pList       = a_pList;
+
+   if( a_pList )
+   {
+      vRetcode = listq_clean(a_pList);
+   }
+   else
+   {
+      vRetcode =  -1;
+   }
+
+   if( a_pList )
+   {
+      free(a_pList);
+   }
+
+   return vRetcode;
+
+}
+//****************************************************
+//*
+//****************************************************
+int listq_clean(listq_t a_pList )
+{
+   int                        vRetcode    = 0;
    sListqContainer_t*         pList       = a_pList;
-   slistqContainerItem_t*    pItem       = 0;
+   slistqContainerItem_t*     pItem       = 0;
 
    if( pList )
    {
@@ -39,6 +65,27 @@ int listq_destroy(listq_t a_pList )
       {
          listq_removeItem(a_pList,pItem);
       }
+
+      pList->m_Size = 0;
+   }
+   else
+   {
+      vRetcode =  -1;
+   }
+
+   return vRetcode;
+}
+//****************************************************
+//*
+//****************************************************
+int listq_size(    listq_t        a_pList)
+{
+   int                        vRetcode    = 0;
+   sListqContainer_t*         pList       = a_pList;
+
+   if( pList )
+   {
+      vRetcode =    pList->m_Size;
    }
    else
    {
@@ -82,6 +129,8 @@ listq_item_t listq_add_tail( listq_t   a_pList ,
       TAILQ_INSERT_TAIL(&(plist->m_Listq), pItem, m_Entries);
 
       pRetvalue = (listq_item_t)pItem;
+
+      plist->m_Size++;
    }
 
    return pRetvalue;
@@ -106,30 +155,73 @@ void* listq_getData(    listq_item_t   a_pItem)
 //****************************************************
 //*
 //****************************************************
-int  listq_removeItem(    listq_t       a_pList ,
-                          listq_item_t  a_pItem)
+int  listq_FindItem(    listq_t       a_pList ,
+                        listq_item_t  a_pItem)
 {
-   int                        vRetvalue         = 0;
-   sListqContainer_t*         pContainer        = a_pList;
-   slistqContainerItem_t*    pContainerItem    = a_pItem;
+   int                        vRetcode    = 0;
+   sListqContainer_t*         pList       = a_pList;
+   slistqContainerItem_t*     pItem       = a_pItem;
 
-
-
-   if(   (pContainer       == 0 )
-   || (pContainerItem   == 0 )
-   || (pContainerItem->p_Container  != pContainer   ) )
+   if(   ( a_pList == 0 )
+      || ( a_pItem == 0 )
+      || ( pItem->p_Container != a_pList )
+      )
    {
-      vRetvalue = -1;
+      vRetcode =  -1;
    }
    else
    {
-      TAILQ_REMOVE(  &(pContainer->m_Listq),
-                     pContainerItem,
-                     m_Entries);
-      free(a_pItem);
+      for(  pItem = pList->m_Listq.tqh_first;
+            pItem ;
+            pItem = pList->m_Listq.tqh_first->m_Entries.tqe_next)
+      {
+         if( pItem == a_pItem )
+         {
+            vRetcode  = 1;
+            break;
+         }
+      }
    }
 
-   return vRetvalue;
+   return vRetcode;
+}
+//****************************************************
+//*
+//****************************************************
+int  listq_removeItem(    listq_t       a_pList ,
+                          listq_item_t  a_pItem)
+{
+   int                        vRetcode         = 0;
+   sListqContainer_t*         pContainer        = a_pList;
+   slistqContainerItem_t*     pContainerItem    = a_pItem;
+
+   if(   (pContainer       == 0 )
+      || (pContainerItem   == 0 )
+      || (pContainerItem->p_Container  != pContainer   ) )
+   {
+      vRetcode = -1;
+   }
+   else
+   {
+      vRetcode = listq_FindItem(a_pList,a_pItem);
+
+      if( vRetcode )
+      {
+         TAILQ_REMOVE(  &(pContainer->m_Listq),
+                        pContainerItem,
+                        m_Entries);
+
+         memset(pContainerItem,0,sizeof(slistqContainerItem_t));
+         free(a_pItem);
+         pContainer->m_Size--;
+      }
+      else
+      {
+         vRetcode = -2;
+      }
+   }
+
+   return vRetcode;
 }
 //****************************************************
 //*

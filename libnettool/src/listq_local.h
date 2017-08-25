@@ -16,7 +16,7 @@ struct sListqContainer
 {
       TAILQ_HEAD(sListq, sListqContainerItem) m_Listq;
 
-      int m_count;
+      int m_Size;
 };
 typedef struct sListqContainer sListqContainer_t;
 
