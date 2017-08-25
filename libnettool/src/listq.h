@@ -27,8 +27,8 @@ void*                listq_getData(    listq_item_t   a_pItem);
 int                  listq_removeItem(    listq_t       a_pList ,
                                           listq_item_t  a_pItem);
 
-int                  listq_concat(     listq_t        a_pList ,
-                                       void*          a_pData);
+//int                  listq_concat(     listq_t        a_pList ,
+//                                       void*          a_pData);
 
 listq_item_t         listq_head(       listq_t        a_pList);
 
@@ -36,8 +36,8 @@ listq_item_t         listq_next(       listq_item_t   a_pItem);
 
 listq_item_t         listq_end(        listq_t        a_pList);
 
-int                  listq_insert_after( listq_t      a_pList ,
-                                        void*         a_pData);
+//int                  listq_insert_after( listq_t      a_pList ,
+//                                        void*         a_pData);
 
 
 #endif /* LISTQ_H_ */

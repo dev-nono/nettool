@@ -226,13 +226,13 @@ int  listq_removeItem(    listq_t       a_pList ,
 //****************************************************
 //*
 //****************************************************
-int listq_concat(    listq_t             a_pList ,
-                     void*                a_pData)
-{
-   int vRetvalue = 0;
-
-   return vRetvalue;
-}
+//int listq_concat(    listq_t             a_pList ,
+//                     void*                a_pData)
+//{
+//   int vRetvalue = 0;
+//
+//   return vRetvalue;
+//}
 //****************************************************
 //*
 //****************************************************
@@ -253,11 +253,11 @@ listq_item_t listq_next( listq_item_t  a_pItem)
 //****************************************************
 //*
 //****************************************************
-int listq_insert_after(    listq_t             a_pList ,
-                           void*                a_pData)
-{
-   int vRetvalue = 0;
-
-   return vRetvalue;
-}
+//int listq_insert_after(    listq_t             a_pList ,
+//                           void*                a_pData)
+//{
+//   int vRetvalue = 0;
+//
+//   return vRetvalue;
+//}
 
