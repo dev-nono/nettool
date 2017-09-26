@@ -9,9 +9,9 @@
 #include <time.h>
 #include <math.h>
 #include <stdio.h>
+#include <Util_TimeSpec/TU_UTIL_Timespec.h>
 #include "test.h"
 #include "UTIL_Timespec.h"
-#include "tu_UTIL_Timespec.h"
 
 
 //********************************************

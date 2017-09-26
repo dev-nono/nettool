@@ -48,6 +48,8 @@ using namespace std;
 #define TEST_UTIL_TIMESPEC       21
 #define TEST_GPIO_SELECT         22
 #define TEST_QUEUE               23
+#define TEST_RM_FILE             24
+#define TEST_UTIL_TIMEOUT        25
 
 
 int Test_WaitFifo()
@@ -92,30 +94,42 @@ int Test_gettimeofday()
 
 void PrintUsage()
 {
-   printf( "\n%d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n %d %s\n \n",
+   printf("\n"
+   " %2d %s\n %2d %s\n %2d %s\n %2d %s\n %2d %s\n"
+   " %2d %s\n %2d %s\n %2d %s\n %2d %s\n %2d %s\n"
+   " %2d %s\n %2d %s\n %2d %s\n %2d %s\n %2d %s\n"
+   " %2d %s\n %2d %s\n %2d %s\n %2d %s\n %2d %s\n"
+   " %2d %s\n %2d %s\n %2d %s\n %2d %s\n %2d %s\n"
+   "\n",
            TEST_READ_FILE ,                  "CheckReadFile(argc, argv);",
            TEST_PIPE ,                       "CheckPipe",
            TEST_GET_TIME_OF_DAY,             "Test_gettimeofday",
            TEST_WAIT_GPIO,                   "Test_WaitGpio",
            TEST_WAIT_FIFO,                   "Test_WaitFifo",
+
            TEST_STRING,                      "TestString",
            TEST_IPCALC,                      "ipcalcMain( argc, argv);",
            TEST_INET_PTON,                   "Net_inet_pton( argc, argv) : 8 [01] ip ",
            TEST_STRING_SUBSTR,               "StringSubstr( argc, argv);",
            TEST_SSCANF,                      "Sscanf(int argc, char **argv)", //
+
            TEST_CALC_MASK,                   "CalcMask(int argc, char **argv)", //
            TEST_CHECK_STATE_MACHINE,         "CheckStateMachine",
            TEST_ARGV,                        "Test_Argv",
            TEST_COUNT_DONW,                  "Countdown(int argc, char **argv)",
            TEST_TIMER,                       "timer(int argc, char **argv)",
+
            TEST_CONDITION_VARIABLE,          "TEST_CONDITION_VARIABLE",
            TEST_WAIT_SIGNAL,                 "TEST_WAIT_SIGNAL",
            TEST_SLEEP,                       "TEST_SLEEP",
            TEST_MODF,                        "TEST_MODF",
            TEST_LONG_DOUBLE,                 "TEST_LONG_DOUBLE",
+
            TEST_UTIL_TIMESPEC,               "TEST_UTIL_TIMESPEC",
            TEST_GPIO_SELECT,				      "TEST_GPIO_SELECT",
-           TEST_QUEUE,                       "TEST_QUEUE"
+           TEST_QUEUE,                       "TEST_QUEUE",
+           TEST_RM_FILE,                     "TEST_RM_FILE",
+           TEST_UTIL_TIMEOUT,                "TEST_UTIL_TIMEOUT"
 
    );
 
@@ -244,7 +258,17 @@ int main(int argc, char **argv)
           }
           case TEST_QUEUE:
           {
-             main_queue( argc, argv);
+             //main_queue( argc, argv);
+             break;
+          }
+          case TEST_RM_FILE:
+          {
+             main_rm_file(argc, argv);
+             break;
+          }
+          case TEST_UTIL_TIMEOUT:
+          {
+             main_TU_Timeout(argc, argv);
              break;
           }
     default:

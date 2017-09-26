@@ -39,7 +39,7 @@ void Printf(const char *fmt, ...)
 
     clock_gettime(CLOCK_MONOTONIC_RAW,&vTimespec);
 
-    vNbChar  = sprintf(vBuffer,"%ld.%ld %lu %s\n",
+    vNbChar  = sprintf(vBuffer,"%.10ld.%.9ld %lu %s\n",
               (long)vTimespec.tv_sec,
               (long)vTimespec.tv_nsec,
               pthread_self(),

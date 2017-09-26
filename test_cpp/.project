@@ -26,12 +26,22 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>src/UTIL_Timespec.cpp</name>
+			<name>src/UTIL_Timeout/UTIL_Timeout.cpp</name>
+			<type>1</type>
+			<location>/home/hico/CR5-Debian/branches/jira_06/dev/LdT/util/UTIL_Timeout.cpp</location>
+		</link>
+		<link>
+			<name>src/UTIL_Timeout/UTIL_Timeout.h</name>
+			<type>1</type>
+			<location>/home/hico/CR5-Debian/branches/jira_06/dev/LdT/util/UTIL_Timeout.h</location>
+		</link>
+		<link>
+			<name>src/Util_TimeSpec/UTIL_Timespec.cpp</name>
 			<type>1</type>
 			<location>/home/hico/CR5-Debian/branches/jira_06/dev/LdT/util/UTIL_Timespec.cpp</location>
 		</link>
 		<link>
-			<name>src/UTIL_Timespec.h</name>
+			<name>src/Util_TimeSpec/UTIL_Timespec.h</name>
 			<type>1</type>
 			<location>/home/hico/CR5-Debian/branches/jira_06/dev/LdT/util/UTIL_Timespec.h</location>
 		</link>

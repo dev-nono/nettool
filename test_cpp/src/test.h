@@ -15,12 +15,12 @@ extern "C" {
 #include "WaitFifo.h"
 #include "WaitGpio.h"
 
-#include "test.h"
 
 //**********************
 // main.c
 //**********************
 void SyntaxError(int argc, char **argv);
+void PrintUsage();
 
 //**********************
 // WaitGpio.c
@@ -89,7 +89,9 @@ void Test_unit_Util_timespec_main();
 void Test_Gpio_Select();
 int main_queue(int argc, char **argv);
 
+int main_rm_file(int argc, char **argv);
 
+int main_TU_Timeout(int argc, char **argv);
 
 
 #define WAN2_STATE_INIT          0
@@ -119,6 +121,7 @@ int main_queue(int argc, char **argv);
 #define WAN2_STATE_LINK                17
 #define WAN2_STATE_LINK_ERR            18
 
+#if 0
 #ifdef __cplusplus
 
 class CUtilNet_StateMachine
@@ -176,7 +179,7 @@ public:
    //************************************************
    bool isIpDns2(){
          return getState() &  (1 << WAN2_STATE_DNS_2);}
-   bool isIpDns2Err(){
+   bool isIpDns2Err(){CUtilNet_StateMachine
          return getState() &  (1 << WAN2_STATE_DNS_2_ERR);}
    //************************************************
    bool isIpDaemonClient(){
@@ -206,6 +209,7 @@ private:
 
 }; // class CWan2StateMachine
 #endif
+#endif // #if 0
 
 #ifdef __cplusplus
 }
