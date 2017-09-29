@@ -20,38 +20,34 @@
 
 void Printf(const char *fmt, ...)
 {
-    va_list args;
-    char vBuffArg[512];
-    int vLenBuffArg __attribute__ ((unused)) = 0;
+   va_list args;
+   char vBuffArg[512];
+   int vLenBuffArg __attribute__ ((unused)) = 0;
 
-    struct timespec vTimespec;
-    char           vBuffer[1024];
-    int vNbChar = 0;
+   struct timespec vTimespec;
+   char           vBuffer[1024];
+   int vNbChar = 0;
 
-    //pthread_mutex_lock(&g_mutex);
+   setvbuf (stdout, NULL, _IONBF, 0); // patch for bug printf
 
-
-    va_start( args, fmt );
-
-    vLenBuffArg = vsnprintf ( vBuffArg, sizeof vBuffArg, fmt, args );
-    va_end (args);
+   //pthread_mutex_lock(&g_mutex);
 
 
-    clock_gettime(CLOCK_MONOTONIC_RAW,&vTimespec);
+   va_start( args, fmt );
 
-    vNbChar  = sprintf(vBuffer,"%.10ld.%.9ld %lu %s\n",
-              (long)vTimespec.tv_sec,
-              (long)vTimespec.tv_nsec,
-              pthread_self(),
-              vBuffArg);
-
-       //pthread_mutex_lock(&g_mutex);
-
-       write(1,vBuffer,vNbChar);
-
-       //pthread_mutex_unlock(&g_mutex);
+   vLenBuffArg = vsnprintf ( vBuffArg, sizeof vBuffArg, fmt, args );
+   va_end (args);
 
 
+   clock_gettime(CLOCK_MONOTONIC_RAW,&vTimespec);
+
+   vNbChar  = sprintf(vBuffer,"%.10ld.%.9ld %lX %s \n",
+             (long)vTimespec.tv_sec,
+             (long)vTimespec.tv_nsec,
+             pthread_self(),
+             vBuffArg);
+
+   write(1,vBuffer,vNbChar);
 }
 //****************************************************
 //********************************************************
@@ -66,7 +62,7 @@ void PrintfLn(char* a_Message)
 
 clock_gettime(CLOCK_MONOTONIC_RAW,&vTimespec);
 
-vNbChar  = sprintf(vBuffer,"%.10ld.%.9ld %lu %s\n",
+vNbChar  = sprintf(vBuffer,"%.10ld.%.9ld %lX %s\n",
           (long)vTimespec.tv_sec,
           (long)vTimespec.tv_nsec,
           pthread_self(),

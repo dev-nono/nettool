@@ -20,6 +20,9 @@
 
 #include "test.h"
 
+#define SIG_CUST_1 ( SIGRTMIN + 1 )
+#define SIG_CUST_2 ( SIGRTMIN + 2 )
+
 //********************************************************
 //* data static
 //********************************************************
@@ -36,11 +39,18 @@ struct sTreadData
    struct sigaction     Sigaction;
    int                  Signal;
    CTimeout             *p_CTimeout;
+
+   union sigval          Sigval;
 };
 struct sTreadData g_StructData_1;
 struct sTreadData g_StructData_2;
 struct sTreadData g_StructData_3;
 struct sTreadData g_StructData_main;
+
+static void  staticHandlerDefault (int, siginfo_t *, void *)
+{
+
+}
 
 //****************************************************************************
 //*
@@ -170,8 +180,8 @@ static int Wait_2(struct sTreadData * a_pStruct)
 
      if( (vRetcode == SIGALRM )
         //( sigismember(&a_pStruct->SigsetMask,SIGALRM) > 0 )
-        //||  ( sigismember(&a_pStruct->SigsetMask,SIGUSR1) > 0 )
-        //  ( sigismember(&a_pStruct->SigsetMask,SIGUSR2) > 0 )
+        //||  ( sigismember(&a_pStruct->SigsetMask,SIG_CUST_1) > 0 )
+        //  ( sigismember(&a_pStruct->SigsetMask,SIG_CUST_2) > 0 )
      )
      {
         sprintf(vBuffer,"\t\t Wait_2_2(%d)_1 : reception  vRetcode=%d",
@@ -230,19 +240,37 @@ static int Wait_2(struct sTreadData * a_pStruct)
 //****************************************************************************
 static void* funcThread_CTimeout(void* a_pArg)
 {
-   int vRetcode  = 0;
-   //sigset_t       vSigsetOld;
+   struct sTreadData*   pData       = (struct sTreadData*)a_pArg;
+   int                  vRetcode    = 0;
+   struct sigaction     vAction;
+/*
+   vRetcode = sigemptyset(&vAction.sa_mask);
+   vRetcode = sigaddset(&vAction.sa_mask, SIG_CUST_1);
+   vRetcode = sigaddset(&vAction.sa_mask, SIG_CUST_2);
 
-   struct sTreadData* pData = (struct sTreadData*)a_pArg;
+   vRetcode = pthread_sigmask(SIG_BLOCK,&vAction.sa_mask,NULL);
 
-   pData->p_CTimeout->Initialize();
+   //**************************************
+   vAction.sa_flags = SA_SIGINFO;
+
+   // add handler to action
+   vAction.sa_sigaction = staticHandlerDefault;
+
+   sigaction(SIG_CUST_1, &vAction, NULL);
+   sigaction(SIG_CUST_2, &vAction, NULL);
+*/
 
    do
    {
-//      Printf("funcThread(%d) :: Wait CountDown.tv_sec=%d",
+//      Printf("funcThread(%d) :: Wait CountDown.tv_sec=%d",g
 //             pData->ID,
 //             (int)pData->CountDown.tv_sec);
-      vRetcode = pData->p_CTimeout->Wait_2(pData->CountDown);
+
+     // pData->p_CTimeout->BlockSignal();
+
+      vRetcode = pData->p_CTimeout->Wait (pData->CountDown);
+
+     // pData->p_CTimeout->UnBlockSignal();
 
    }while(1);
 
@@ -256,18 +284,13 @@ static void* funcThread_CTimeout(void* a_pArg)
 static void* funcThread(void* a_pArg)
 {
    int vRetcode  = 0;
-   //sigset_t       vSigsetOld;
-
    struct sTreadData* pData = (struct sTreadData*)a_pArg;
-
-
-
    //*********************************************
    vRetcode = sigemptyset (&pData->SigsetMask);
 
-   vRetcode = sigaddset(&pData->SigsetMask, SIGALRM);
-   vRetcode = sigaddset(&pData->SigsetMask, SIGUSR1);
- //  vRetcode = sigaddset(&pData->SigsetMask, SIGUSR2);
+   //vRetcode = sigaddset(&pData->SigsetMask, SIGALRM);
+   vRetcode = sigaddset(&pData->SigsetMask, SIG_CUST_1);
+   vRetcode = sigaddset(&pData->SigsetMask, SIG_CUST_2);
 
 //   memset(&vSigsetOld,0,sizeof(vSigsetOld));
 //   // set signal
@@ -315,8 +338,7 @@ static int   CreateThread_2()
 
    vRetcode = pthread_create(&g_StructData_1.TreadID,NULL,funcThread_CTimeout,&g_StructData_1);
    vRetcode = pthread_create(&g_StructData_2.TreadID,NULL,funcThread_CTimeout,&g_StructData_2);
-   vRetcode = pthread_create(&g_StructData_3.TreadID,NULL,funcThread_CTimeout
-                             ,&g_StructData_3);
+   vRetcode = pthread_create(&g_StructData_3.TreadID,NULL,funcThread_CTimeout,&g_StructData_3);
 
    return vRetcode;
 }
@@ -331,20 +353,30 @@ int main_TU_Timeout(int argc, char **argv)
    int      vSignal  = SIGALRM;
 
    sigval_t vSigval;
-   int vMode = 0;
-   vMode = 1; // mode CTIMEOUT
 
+   struct sTreadData * pCurrentStruct = 0;
+
+
+   //********************************
+   // mode
+   // 01       wait intern
+   // 10       CTimeout send()
+   // 11       CTimeout send(signal)
+   int vMode = 0;
+
+   if( argc > 2 )
+   {
+      vMode = atoi(argv[3-1]);
+   }
 
 
    CTimeout             vCTimeout_1;
    CTimeout             vCTimeout_2;
    CTimeout             vCTimeout_3;
 
-
    memset( &g_StructData_1,0,sizeof(g_StructData_1));
    memset( &g_StructData_2,0,sizeof(g_StructData_2));
    memset( &g_StructData_3,0,sizeof(g_StructData_3));
-
    memset( &g_StructData_main,0,sizeof(g_StructData_main));
 
    g_StructData_1.p_CTimeout = & vCTimeout_1;
@@ -359,126 +391,101 @@ int main_TU_Timeout(int argc, char **argv)
    g_StructData_2.ID = 2;
    g_StructData_3.ID = 3;
 
-   g_StructData_1.Signal = SIGALRM;
-   g_StructData_2.Signal = SIGALRM;
-   g_StructData_3.Signal = SIGALRM;
 
 
-   vRetcode = sigaddset(&g_StructData_main.SigsetMask, SIGUSR2);
-   vRetcode = pthread_sigmask(SIG_BLOCK,&g_StructData_main.SigsetMask,NULL);
-
+//   vRetcode = sigaddset(&g_StructData_main.SigsetMask, SIG_CUST_2);
+//   vRetcode = pthread_sigmask(SIG_BLOCK,&g_StructData_main.SigsetMask,NULL);
 
    if( vMode == 0 )
+   {
+      g_StructData_1.Signal = SIGALRM;
+      g_StructData_2.Signal = SIGALRM;
+      g_StructData_3.Signal = SIGALRM;
+
       CreateThread_1();
+   }
    else
-      CreateThread_2(); // class CTimeout
+   {
+      CreateThread_2(); // class CTimeout::wait()
+   }
 
 
    do{
 
-      PrintfLn((char*)"main_WaitSignal_1 : Apuyer sur une touche pour continuer");
+     // PrintfLn((char*)"main_WaitSignal_1 : Apuyer sur une touche pour continuer");
       // vChar = getchar();
       memset(vInputBuffer,0,sizeof(vInputBuffer));
 
       fgets(vInputBuffer,4,stdin);
 
+      if(      vInputBuffer[1] == '1' ){  vSignal  = SIG_CUST_1;}
+      else if( vInputBuffer[1] == '2' ){  vSignal  = SIG_CUST_2;}
+      else                             {  vSignal  = SIGALRM;}
 
+      //******************************************************************
+      //******************************************************************
       if( vInputBuffer[0] == '1' )
       {
+         pCurrentStruct = &g_StructData_1;
          //sprintf(vBuffer,"WaitSignal_sigtimedwait ==> char 1"); PrintfLn(vBuffer);
-
-         if( vInputBuffer[1] == '1' )         {
-            vSignal  = SIGUSR1;         }
-         else if( vInputBuffer[1] == '2' )         {
-            vSignal  = SIGUSR2;         }
-         else      {
-            vSignal  = SIGALRM;         }
-
-        if( vMode == 0 )
-         {
-            vRetcode  = pthread_sigqueue( g_StructData_1.TreadID,
-                                          vSignal,
-                                          g_StructData_1.Siginfo._sifields._timer.si_sigval);
-         }
-         else
-         {
-            vRetcode =  g_StructData_1.p_CTimeout->SendSignal();
-//            vRetcode  = pthread_sigqueue( g_StructData_1.TreadID,
-//                                          vSignal,
-//                                          g_StructData_1.Siginfo._sifields._timer.si_sigval);
-//
-         }
       }
+      //******************************************************************
+      //******************************************************************
       else if( vInputBuffer[0] == '2' )
       {
-         //sprintf(vBuffer,"WaitSignal_sigtimedwait ==> char 2");PrintfLn(vBuffer);
-
-         if( vInputBuffer[1] == '1' )         {
-            vSignal  = SIGUSR1;         }
-         else if( vInputBuffer[1] == '2' )         {
-            vSignal  = SIGUSR2;         }
-         else      {
-            vSignal  = SIGALRM;         }
-
-         if( vMode == 0 )
-         {
-            vRetcode  = pthread_sigqueue( g_StructData_2.TreadID,
-                                          vSignal,
-                                          g_StructData_2.Siginfo._sifields._timer.si_sigval);
-         }
-         else
-         {
-            vRetcode =  g_StructData_2.p_CTimeout->SendSignal();
-            //vRetcode =  g_StructData_2.p_CTimeout->SendSignal(vSignal);
-         }
-
+         pCurrentStruct = &g_StructData_2;
       }
+      //******************************************************************
+      //******************************************************************
       else if( vInputBuffer[0] == '3' )
       {
-         //sprintf(vBuffer,"WaitSignal_sigtimedwait ==> char 3");PrintfLn(vBuffer);
-
-         if( vInputBuffer[1] == '1' )         {
-            vSignal  = SIGUSR1;         }
-         else if( vInputBuffer[1] == '2' )         {
-            vSignal  = SIGUSR2;         }
-         else      {
-            vSignal  = SIGALRM;         }
-
-         if( vMode == 0 )
-         {
-            vRetcode  = pthread_sigqueue( g_StructData_3.TreadID,
-                                          vSignal,
-                                          g_StructData_2.Siginfo._sifields._timer.si_sigval);
-         }
-         else
-         {
-            //vRetcode = g_StructData_3.p_CTimeout->SendSignal(vSignal);
-            vRetcode =  g_StructData_3.p_CTimeout->SendSignal();
-         }
+         pCurrentStruct = &g_StructData_3;
       }
+      //******************************************************************
+      //******************************************************************
       else
       {
-         //sprintf(vBuffer,"WaitSignal_sigtimedwait ==> char 3");PrintfLn(vBuffer);
-
-         if( vInputBuffer[1] == '1' )         {
-            vSignal  = SIGUSR1;         }
-         else if( vInputBuffer[1] == '2' )         {
-            vSignal  = SIGUSR2;         }
-         else      {
-            vSignal  = SIGALRM;         }
-
-         if( vMode == 0 )
-         {
-            vRetcode  = pthread_sigqueue( g_StructData_1.TreadID,
-                                          vSignal,
-                                          vSigval);
-         }
-         else
-         {
-            //vRetcode = g_StructData_3.p_CTimeout->SendSignal(vSignal);
-            vRetcode =  g_StructData_3.p_CTimeout->SendSignal();
-         }
+         pCurrentStruct = &g_StructData_1;
       }
+//*****************************************************
+      if( vMode == 0 )
+       {
+         pCurrentStruct-> Sigval.sival_int = vSignal;
+         pCurrentStruct-> Sigval.sival_ptr = 0;
+
+         vRetcode  = pthread_sigqueue( pCurrentStruct->TreadID,
+                                        vSignal,
+                                        pCurrentStruct->Sigval);
+
+         if ( vRetcode != 0 )
+            Printf((char*)"Send(%#.2X)_0 vRetcode=%d errno=%d %s",
+                   vSignal,vRetcode,errno, strerror(errno));
+       }
+       else
+       {
+          if( vMode == 10)
+          {
+             vRetcode = pCurrentStruct->p_CTimeout->SendSignal();
+
+             if ( vRetcode != 0 )
+                Printf((char*)"Send(%#.2X)_10 vRetcode=%d errno=%d %s",
+                   vSignal,vRetcode,errno, strerror(errno));
+          }
+          else // ( vMode == 11 )
+          {
+             pCurrentStruct-> Sigval.sival_int = vSignal;
+             pCurrentStruct-> Sigval.sival_ptr = 0;
+
+             vRetcode  = pthread_sigqueue( pCurrentStruct->p_CTimeout->getThreadId(),
+                                           vSignal,
+                                           pCurrentStruct->Sigval);
+
+             if ( vRetcode != 0 )
+                Printf((char*)"Send(%#.2X)_11 vRetcode=%d errno=%d %s",
+                   vSignal,vRetcode,errno, strerror(errno));
+          }
+
+       }
 
       //PrintfLn(vBuffer);
 
