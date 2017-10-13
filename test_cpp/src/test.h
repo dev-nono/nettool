@@ -93,6 +93,8 @@ int main_rm_file(int argc, char **argv);
 
 int main_TU_Timeout(int argc, char **argv);
 
+int main_Math(int argc, char **argv);
+
 
 #define WAN2_STATE_INIT          0
 #define WAN2_STATE_START         1

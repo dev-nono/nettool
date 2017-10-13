@@ -43,7 +43,7 @@ static int rm_file_remove(int argc, char **argv)
       }while (ii < vNb);
       free (namelist);
    }
-
+   return 0;
 }
 
 static int rm_file_scan(int argc, char **argv)
@@ -67,6 +67,9 @@ static int rm_file_scan(int argc, char **argv)
       }while (ii < vNb);
       free (namelist);
    }
+
+   return 0;
+
 }
 
 
@@ -83,4 +86,6 @@ int main_rm_file(int argc, char **argv)
    {
       PrintUsage();
    }
+   return 0;
+
 }

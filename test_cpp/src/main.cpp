@@ -50,6 +50,7 @@ using namespace std;
 #define TEST_QUEUE               23
 #define TEST_RM_FILE             24
 #define TEST_UTIL_TIMEOUT        25
+#define TEST_MATH                26
 
 
 int Test_WaitFifo()
@@ -100,6 +101,7 @@ void PrintUsage()
    " %2d %s\n %2d %s\n %2d %s\n %2d %s\n %2d %s\n"
    " %2d %s\n %2d %s\n %2d %s\n %2d %s\n %2d %s\n"
    " %2d %s\n %2d %s\n %2d %s\n %2d %s\n %2d %s\n"
+   " %2d %s \n"
    "\n",
            TEST_READ_FILE ,                  "CheckReadFile(argc, argv);",
            TEST_PIPE ,                       "CheckPipe",
@@ -129,7 +131,8 @@ void PrintUsage()
            TEST_GPIO_SELECT,				      "TEST_GPIO_SELECT",
            TEST_QUEUE,                       "TEST_QUEUE",
            TEST_RM_FILE,                     "TEST_RM_FILE",
-           TEST_UTIL_TIMEOUT,                "TEST_UTIL_TIMEOUT"
+           TEST_UTIL_TIMEOUT,                "TEST_UTIL_TIMEOUT",
+           TEST_MATH,                        "TEST_MATH"
 
    );
 
@@ -271,7 +274,12 @@ int main(int argc, char **argv)
              main_TU_Timeout(argc, argv);
              break;
           }
-    default:
+           case TEST_MATH:
+          {
+             main_Math(argc, argv);
+             break;
+          }
+   default:
             PrintUsage();
             break;
       };

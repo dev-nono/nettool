@@ -12,6 +12,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "UTIL_Timeout.h"
 #include "UTIL_Timespec.h"
@@ -19,6 +20,9 @@
 #include "../Common.h"
 
 #include "test.h"
+
+#define DEBUG_UTIL_TIMEOUT 1
+#include "DEBUG_PRINTF.h"
 
 #define SIG_CUST_1 ( SIGRTMIN + 1 )
 #define SIG_CUST_2 ( SIGRTMIN + 2 )
@@ -39,6 +43,7 @@ struct sTreadData
    struct sigaction     Sigaction;
    int                  Signal;
    CTimeout             *p_CTimeout;
+   CTimeout             *p_CTimeout2;
 
    union sigval          Sigval;
 };
@@ -47,9 +52,14 @@ struct sTreadData g_StructData_2;
 struct sTreadData g_StructData_3;
 struct sTreadData g_StructData_main;
 
-static void  staticHandlerDefault (int, siginfo_t *, void *)
+static void   staticHandlerDefault (int a_Signal, siginfo_t * a_pSigInfo, void *a_pData)
 {
-
+   DEBUG_PRINTF("CTimeout::staticHandlerDefault signal=%d si_code=%d si_errno=%d si_signo=%d pData=%p",
+                a_Signal,
+                a_pSigInfo->si_code,
+                a_pSigInfo->si_errno,
+                a_pSigInfo->si_signo,
+                a_pData);
 }
 
 //****************************************************************************
@@ -148,6 +158,8 @@ static int Wait_1(struct sTreadData * a_pStruct)
       }
    }while( vRetcode != a_pStruct->Signal );
 
+   return 0;
+
 }
 //****************************************************************************
 //*
@@ -242,15 +254,79 @@ static void* funcThread_CTimeout(void* a_pArg)
 {
    struct sTreadData*   pData       = (struct sTreadData*)a_pArg;
    int                  vRetcode    = 0;
-   struct sigaction     vAction;
-/*
+   //struct sigaction     vAction;
+   char                 vBuffer[20];
+
+   snprintf(vBuffer,15,"CTimeout_%d",(int)syscall(SYS_gettid) );
+   vBuffer[15] = 0;
+
+   pthread_setname_np(pthread_self(),vBuffer );
+
+    DEBUG_PRINTF("funcThread_CTimeout(%d)_IN", pData->ID);
+
+    if(pData->ID == 1 )
+    {
+       pData->p_CTimeout->Register();
+       pData->p_CTimeout2->Register();
+    }
+
+//   int vNbCount = 0;
+
+   do
+   {
+
+//      vNbCount = 0;
+//      if( pData->ID == 1 )
+//      {
+//         pData->p_CTimeout->UnRegister();
+//
+//      }
+
+//      if( pData->ID == 1 )
+//      {
+//         DEBUG_PRINTF("funcThread_CTimeout(%d)_2", pData->ID);
+//         do
+//         {
+////            //sleep(1);
+////            usleep(1000 * 500 );
+////            vNbCount++;
+////            if( vNbCount > 100 ) //
+////            {
+////               break;
+////            }
+//         }while(1);
+//         DEBUG_PRINTF("funcThread_CTimeout(%d)_3",pData->ID);
+//      }
+//      Printf("funcThread(%d) :: Wait CountDown.tv_sec=%d",g
+//             pData->ID,
+//             (int)pData->CountDown.tv_sec);
+
+     // pData->p_CTimeout->BlockSignal();
+
+      DEBUG_PRINTF("=== funcThread_CTimeout(%d)_1", pData->ID);
+
+      vRetcode = pData->p_CTimeout->Wait (pData->CountDown);
+
+      DEBUG_PRINTF("=== funcThread_CTimeout(%d)_2  vRetcode=%d", pData->ID,vRetcode);
+
+      vRetcode = pData->p_CTimeout2->Wait (pData->CountDown);
+
+      DEBUG_PRINTF("=== funcThread_CTimeout(%d)_3", pData->ID);
+      // pData->p_CTimeout->UnBlockSignal();
+
+   }while(1);
+
+   pData->p_CTimeout->UnRegister();
+   pData->p_CTimeout2->UnRegister();
+
+  /*
    vRetcode = sigemptyset(&vAction.sa_mask);
    vRetcode = sigaddset(&vAction.sa_mask, SIG_CUST_1);
    vRetcode = sigaddset(&vAction.sa_mask, SIG_CUST_2);
 
    vRetcode = pthread_sigmask(SIG_BLOCK,&vAction.sa_mask,NULL);
 
-   //**************************************
+   // **************************************
    vAction.sa_flags = SA_SIGINFO;
 
    // add handler to action
@@ -260,21 +336,7 @@ static void* funcThread_CTimeout(void* a_pArg)
    sigaction(SIG_CUST_2, &vAction, NULL);
 */
 
-   do
-   {
-//      Printf("funcThread(%d) :: Wait CountDown.tv_sec=%d",g
-//             pData->ID,
-//             (int)pData->CountDown.tv_sec);
-
-     // pData->p_CTimeout->BlockSignal();
-
-      vRetcode = pData->p_CTimeout->Wait (pData->CountDown);
-
-     // pData->p_CTimeout->UnBlockSignal();
-
-   }while(1);
-
-
+   return static_cast<void*> (0);
 
 }
 
@@ -285,6 +347,8 @@ static void* funcThread(void* a_pArg)
 {
    int vRetcode  = 0;
    struct sTreadData* pData = (struct sTreadData*)a_pArg;
+
+   (void)vRetcode;
    //*********************************************
    vRetcode = sigemptyset (&pData->SigsetMask);
 
@@ -313,7 +377,7 @@ static void* funcThread(void* a_pArg)
    }while(1);
 
 
-   return (void*)vRetcode;
+   return static_cast<void*>(0);//&vRetcode);
 
 }
 //****************************************************************************
@@ -337,8 +401,8 @@ static int   CreateThread_2()
    int vRetcode  = 0;
 
    vRetcode = pthread_create(&g_StructData_1.TreadID,NULL,funcThread_CTimeout,&g_StructData_1);
-   vRetcode = pthread_create(&g_StructData_2.TreadID,NULL,funcThread_CTimeout,&g_StructData_2);
-   vRetcode = pthread_create(&g_StructData_3.TreadID,NULL,funcThread_CTimeout,&g_StructData_3);
+//   vRetcode = pthread_create(&g_StructData_2.TreadID,NULL,funcThread_CTimeout,&g_StructData_2);
+   //vRetcode = pthread_create(&g_StructData_3.TreadID,NULL,funcThread_CTimeout,&g_StructData_3);
 
    return vRetcode;
 }
@@ -352,10 +416,11 @@ int main_TU_Timeout(int argc, char **argv)
    //char     vBuffer[1024];
    int      vSignal  = SIGALRM;
 
-   sigval_t vSigval;
+   //sigval_t vSigval;
 
    struct sTreadData * pCurrentStruct = 0;
 
+   vRetcode = pthread_setname_np(pthread_self(),"Main" );
 
    //********************************
    // mode
@@ -371,6 +436,7 @@ int main_TU_Timeout(int argc, char **argv)
 
 
    CTimeout             vCTimeout_1;
+   CTimeout             vCTimeout_12;
    CTimeout             vCTimeout_2;
    CTimeout             vCTimeout_3;
 
@@ -379,9 +445,10 @@ int main_TU_Timeout(int argc, char **argv)
    memset( &g_StructData_3,0,sizeof(g_StructData_3));
    memset( &g_StructData_main,0,sizeof(g_StructData_main));
 
-   g_StructData_1.p_CTimeout = & vCTimeout_1;
-   g_StructData_2.p_CTimeout = & vCTimeout_2;
-   g_StructData_3.p_CTimeout = & vCTimeout_3;
+   g_StructData_1.p_CTimeout     = & vCTimeout_1;
+   g_StructData_1.p_CTimeout2    = & vCTimeout_12;
+   g_StructData_2.p_CTimeout     = & vCTimeout_2;
+   g_StructData_3.p_CTimeout     = & vCTimeout_3;
 
    g_StructData_1.CountDown.tv_sec = 5;
    g_StructData_2.CountDown.tv_sec = 10;
@@ -391,7 +458,11 @@ int main_TU_Timeout(int argc, char **argv)
    g_StructData_2.ID = 2;
    g_StructData_3.ID = 3;
 
+   vCTimeout_1.setModeTrace(UTIL_TIMEOUT_IN);
+   vCTimeout_1.setModeTrace(UTIL_TIMEOUT_WAIT);
 
+   vCTimeout_12.setModeTrace(UTIL_TIMEOUT_IN);
+   vCTimeout_12.setModeTrace(UTIL_TIMEOUT_WAIT);
 
 //   vRetcode = sigaddset(&g_StructData_main.SigsetMask, SIG_CUST_2);
 //   vRetcode = pthread_sigmask(SIG_BLOCK,&g_StructData_main.SigsetMask,NULL);
@@ -447,7 +518,9 @@ int main_TU_Timeout(int argc, char **argv)
       {
          pCurrentStruct = &g_StructData_1;
       }
-//*****************************************************
+      //*****************************************************
+      //*
+      //*****************************************************
       if( vMode == 0 )
        {
          pCurrentStruct-> Sigval.sival_int = vSignal;
@@ -461,22 +534,36 @@ int main_TU_Timeout(int argc, char **argv)
             Printf((char*)"Send(%#.2X)_0 vRetcode=%d errno=%d %s",
                    vSignal,vRetcode,errno, strerror(errno));
        }
+      //*****************************************************
+      //*   mode CTimeout
+      //*****************************************************
        else
        {
           if( vMode == 10)
           {
-             vRetcode = pCurrentStruct->p_CTimeout->SendSignal();
+             if(      vInputBuffer[1] == '1' )
+             {
+                vRetcode = pCurrentStruct->p_CTimeout->SendSignal();
 
-             if ( vRetcode != 0 )
-                Printf((char*)"Send(%#.2X)_10 vRetcode=%d errno=%d %s",
-                   vSignal,vRetcode,errno, strerror(errno));
+                if ( vRetcode != 0 )
+                   Printf((char*)"Main_Send_mode10_1 vRetcode=%d errno=%d %s",
+                      vRetcode,errno, strerror(errno));
+             }
+             else
+             {
+                vRetcode = pCurrentStruct->p_CTimeout2->SendSignal();
+
+                if ( vRetcode != 0 )
+                   Printf((char*)"Main_Send_mode10_2 vRetcode=%d errno=%d %s",
+                      vRetcode,errno, strerror(errno));
+             }
           }
           else // ( vMode == 11 )
           {
              pCurrentStruct-> Sigval.sival_int = vSignal;
              pCurrentStruct-> Sigval.sival_ptr = 0;
 
-             vRetcode  = pthread_sigqueue( pCurrentStruct->p_CTimeout->getThreadId(),
+             vRetcode  = pthread_sigqueue( pCurrentStruct->p_CTimeout->getThreadSelf(),
                                            vSignal,
                                            pCurrentStruct->Sigval);
 

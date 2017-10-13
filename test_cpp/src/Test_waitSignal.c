@@ -318,6 +318,7 @@ void WaitSignal_sigtimedwait()
 
 //   union sigval vValue = {0};
 
+   (void)vRetcode;
 
    memset(&g_StructData_1,0,sizeof(g_StructData_1));
    memset(&g_StructData_2,0,sizeof(g_StructData_2));

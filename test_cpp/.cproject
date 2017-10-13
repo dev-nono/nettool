@@ -25,6 +25,8 @@
 								<option id="gnu.cpp.compiler.exe.debug.option.debugging.level.26455629" name="Debug Level" superClass="gnu.cpp.compiler.exe.debug.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.1423962927" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/jira_06/LdT}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/jira_06/LdT/network/plc_G3/plan/PlcFirmware}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/include/glib-2.0/glib"/>
 									<listOptionValue builtIn="false" value="/usr/include/glib-2.0/"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libnettool/src}&quot;"/>
